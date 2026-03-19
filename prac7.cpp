@@ -61,3 +61,35 @@ using namespace std;
 // }
 
 
+float max(float a, float b){
+    return a>b ? a:b;
+}
+
+float min(float a, float b){
+    return a<b ? a:b;
+}
+
+float max(float* array, int k){
+    float m = array[0];
+    for(int i=1; i<k; i++){
+        m = max(m, array[i]);
+    }
+    return m;
+}
+
+float min(float* array, int k){
+    float m = array[0];
+    for(int i=1; i<k; i++){
+        m = min(m, array[i]);
+    }
+    return m;
+}
+
+int main(){
+    const int k1 = 3, k2 = 5;
+    float array1[3] = {1.0f, 2.0f, 3.0f};
+    float array2[5] = {4.0f, 5.0f, -3.0f, 0.0f, 0.1f};
+    printf("%f\n", min(array1, k1 ) * min(array2, k2));
+    printf("%f\n", sqrt(max(array1, k1) * max(array2, k2)));
+    return 0;
+}
