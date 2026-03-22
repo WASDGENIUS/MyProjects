@@ -1,5 +1,0 @@
----
-triple:          'arm64-apple-darwin'
-binary-path:     '/Users/wasdgenius/VScodeMiscProjects/output/wasd'
-relocations:     []
-...
