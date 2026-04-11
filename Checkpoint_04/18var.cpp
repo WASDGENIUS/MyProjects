@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 enum GameType { RPG, STRATEGY, RACING, FLIGHT_SIM };
@@ -11,6 +12,51 @@ struct Game {
     char platforms[50];
     GameType type;
 };
+
+bool areStringsEqual(const char* str1, const char* str2) {
+    int i = 0;
+    // Проходим по обоим массивам, пока символы совпадают и не достигнут конец строки
+    while (str1[i] != '\0' && str2[i] != '\0') {
+        if (str1[i] != str2[i]) {
+            return false; 
+        }
+        i++;
+    }
+    return str1[i] == '\0' && str2[i] == '\0';
+}
+
+void updatePricesFromFile(Game* arr, int n, const char* filename) {
+    ifstream fin(filename);
+    if (!fin.is_open()) {
+        cout << "Файл настроек не найден." << endl;
+        return;
+    }
+
+    char filePlatform[50];
+    double filePrice;
+
+    while (fin >> filePlatform >> filePrice) {
+        for (int i = 0; i < n; i++) {
+            if (areStringsEqual(arr[i].platforms, filePlatform)) {
+                arr[i].price = filePrice;
+                cout << "Цена обновлена для: " << arr[i].title << " (" << filePlatform << ")" << endl;
+            }
+        }
+    }
+    fin.close(); 
+}
+
+
+void saveToBinary(Game* arr, int n, const char* filename) {
+    ofstream out(filename, ios::binary | ios::out);
+    if (out.is_open()) {
+        out.write((char*)arr, sizeof(Game) * n); // Записываем массив структур целиком [cite: 10]
+        out.close();
+        cout << "Данные сохранены в бинарный файл." << endl;
+    }
+}
+
+
 
 void wrapperDisplay(Game *g) {
     const char* genreNames[] = {"RPG", "Strategy", "Racing", "Flight Sim"};
@@ -52,7 +98,8 @@ void sortByPrice(Game *g, int n) {
 
 int main() {
     setlocale(LC_ALL, "ru");
-    Game *g = new Game[20]{
+    const int N = 20;
+    Game *g = new Game[N]{
         {"The Witcher 3", "CDPR", 1200, 2000000, "PC, Gamepad", RPG},
         {"MS Flight Sim", "Asobo", 3500, 1500000, "PC, Gamepad", FLIGHT_SIM},
         {"Starcraft 2", "Blizzard", 0, 800000, "PC", STRATEGY},
@@ -76,9 +123,9 @@ int main() {
     };
 
     cout << "АВИАСИМУЛЯТОРЫ (ОТ 1 МЛН ИГРОКОВ)" << endl;
-    Game *flightSims = new Game[20];
+    Game *flightSims = new Game[N];
     int fsCount = 0;
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < N; i++) {
         if (g[i].type == FLIGHT_SIM && g[i].players >= 1000000) {
             flightSims[fsCount++] = g[i];
         }
@@ -86,22 +133,25 @@ int main() {
     bubbleSortByPlatform(flightSims, fsCount);
     for (int i = 0; i < fsCount; i++) wrapperDisplay(&flightSims[i]);
 
+    updatePricesFromFile(g, N, "/Users/wasdgenius/VScodeMiscProjects/Lab_09/setup.txt");
+    saveToBinary(g, N, "result.dat");
+
     cout << "\nТОП-3 САМЫХ ДОРОГИХ ИГР" << endl;
-    sortByPrice(g, 20);
+    sortByPrice(g, N);
     for (int i = 0; i < 3; i++) wrapperDisplay(&g[i]);
 
 
     cout << "\nСТРАТЕГИИ ДЛЯ PC" << endl;
-    Game *pcStrategies = new Game[20];
+    Game *pcStrategies = new Game[N];
     int stratCount = 0;
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < N; i++) {
         if (g[i].type == STRATEGY && g[i].platforms[0] == 'P') {
             pcStrategies[stratCount++] = g[i];
         }
     }
     for (int i = 0; i < stratCount; i++) wrapperDisplay(&pcStrategies[i]);
 
-    // Удаление
+
     delete[] g;
     delete[] flightSims;
     delete[] pcStrategies;
