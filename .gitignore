@@ -3,7 +3,7 @@ output/
 .vscode/
 .DS_Store
 *.out
-
+mytrash/
 # Игнорируем исполняемые файлы (бинарники)
 *.exe
 *.out
