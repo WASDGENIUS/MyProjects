@@ -1,25 +1,26 @@
 #include <iostream>
 
+template <typename T>
 class set{
-    int *data;
+    T *data;
     int size;
     int mem;
     public:
     set(){
     mem = 10;
-    data = new int[mem];
+    data = new T[mem];
     size = 0;
     }
     ~set() {
     delete[] data;
     }
-    void add(int item) {
+    void add(T item) {
         for (int i = 0; i < size; i++) {
             if (data[i] == item) return;
         }
         if (mem <= size) {
             mem = mem * 2;
-            int* newData = new int[mem];
+            T* newData = new T[mem];
             for (int i = 0; i < size; i++) {
                 newData[i] = data[i];
             }
@@ -32,18 +33,18 @@ class set{
     set(const set& other) {
         size = other.size;
         mem = other.mem;
-        data = new int[mem];
+        data = new T[mem];
         for (int i = 0; i < size; i++){
             data[i] = other.data[i];
         }
     }
-    set operator+(int item) {
+    set operator+(T item) {
         set result = *this; 
-        result.add(item);  
-        return result;      
+        result.add(item);
+        return result;   
     }
     set operator+(const set &g) {
-        set result = *this; 
+        set result = *this;
         for (int i = 0; i < g.size; i++){
             result.add(g.data[i]);  
         }
@@ -68,18 +69,26 @@ class set{
         }
         std::cout << "}" << std::endl;
     }
+    void printAll(){
+        std::cout << "{" << std::endl;
+        for (int i = 0; i < size; i++){
+            data[i]->print();
+        }
+        std::cout << "}" << std::endl;
+    }
 };
 
 class vehicle{
+    protected:
     int hp;
     int mass;
     char typeengine[20];
     static int totalHP; 
     public:
-    static int getTotalHP() {  // геттер для статического поля
+    static int getTotalHP(){
             return totalHP;
         }
-    vehicle(int hp, int mass, char* engine) {
+    vehicle(int hp, int mass, const char* engine) {
         this->hp = hp;
         this->mass = mass;
         for (int i=0;i<20;i++){
@@ -90,11 +99,20 @@ class vehicle{
     ~vehicle() {
         totalHP -= hp;
     }
-    virtual void info() {
-        std::cout << "Vehicle: " << hp << "hp, " << mass << "kg" << std::endl;
+    virtual void print() {
+        std::cout << "hp:" << hp << " mass:" << mass << std::endl;
+    }
+    vehicle(){
+        hp=0;
+        mass=0;
+        typeengine[0] = ' ';
     }
     
     virtual void move() = 0; 
+
+    bool operator==(vehicle &other){
+        return mass==other.mass && hp==other.hp;
+    }
 };
 int vehicle::totalHP = 0;
 
@@ -102,32 +120,38 @@ int vehicle::totalHP = 0;
 class car : public vehicle{
     int doors;
 public:
-    car(int hp, int mass, char* engine, int doors) : vehicle(hp, mass, engine) {
+    car(int hp, int mass, const char* engine, int doors) : vehicle(hp, mass, engine) {
     this->doors = doors;
+    }
+    car(){
+        doors = 0;
     }
 
     void move() override {
     std::cout << "Car is driving" << std::endl;
     }
 
-    void info() override {
-        std::cout << "Car, doors: " << doors << std::endl;
+    void print() override {
+        std::cout << "Car, doors: " << doors << " hp: " << hp << " mass: " << mass << std::endl;;
     }
 };
 class ship : public vehicle{
     char type[20];
     public:
-    ship(int hp, int mass, char* engine, char type[20]) : vehicle(hp,mass,engine){
+    ship(int hp, int mass, const char* engine, const char type[20]) : vehicle(hp,mass,engine){
         for (int i=0; i<20; i++){
             this->type[i]=type[i];
         }
+    }
+    ship(){
+        type[0] = ' ';
     }
     void move() override {
     std::cout << "ship is sailing" << std::endl;
     }
 
-    void info() override {
-        std::cout << "type ship: " << type << std::endl;
+    void print() override {
+        std::cout << "type ship: " << type << " hp: " << hp << " mass: " << mass << std::endl;
     }
 };
 
@@ -135,17 +159,21 @@ class plane : public vehicle{
     char typeplane[20];
     int engines;
     public:
-    plane(int hp, int mass, char* engine, char typeplane[20], int engines):vehicle(hp, mass, engine){
+    plane(int hp, int mass, const char* engine, const char typeplane[20], int engines):vehicle(hp, mass, engine){
         for (int i=0;i<20;i++){
             this->typeplane[i]=typeplane[i];
         }
         this->engines=engines;
     }
+    plane(){
+        typeplane[0]= ' ';
+        engines = 0;
+    }
     void move() override {
         std::cout << "plane is flying"<<std::endl;
     }
-    void info() override{
-        std::cout << "type plane: " << typeplane << "  engines: " << engines << std::endl;
+    void print() override{
+        std::cout << "type plane: " << typeplane << " engines: " << engines << " hp: " << hp << " mass: " << mass << std::endl;
     }
 };
 
@@ -154,24 +182,41 @@ class plane : public vehicle{
 
 
 int main(){
-    char engine[] = "v4 16 value";
-    car a(200, 1500, engine, 5);
-    a.info();
-    a.move();
+
+    set<int> nums1;
+    nums1.add(1); 
+    nums1.add(2); 
+    nums1.add(3);
     
-    char engine2[] = "diesel";
-    ship b(300, 5000, engine2, "cargo");
-    b.info();
-    b.move();
+    set<int> nums2;
+    nums2.add(2); 
+    nums2.add(3); 
+    nums2.add(4);
     
-    char engine3[] = "jet";
-    char planetype[] = "boeing";
-    plane c(1000, 20000, engine3, planetype, 4);
-    c.info();
-    c.move();
+    set<int> plus = nums1 + nums2;
+    set<int> crossed = nums1 * nums2;
     
-    std::cout << "Total HP: " << vehicle::getTotalHP() << std::endl;
+    nums1.print();
+    plus.print();
+    crossed.print();
     
+    set<char> chars;
+    chars.add('a'); 
+    chars.add('b'); 
+    chars.add('c');
+    chars.print();
+  
+
+    car a(200, 1500,"v4", 5);
+    plane b(1600, 2300,"v16","kukuruznik", 2);
+    ship c(5500, 30000, "v56", "titanic");
+
+    set<vehicle*> mixed;
+    mixed.add(&a);
+    mixed.add(&b);
+    mixed.add(&c);
+    mixed.printAll();
+    std::cout << "total hp: " << vehicle::getTotalHP() << std::endl;
     return 0;
 }
 
