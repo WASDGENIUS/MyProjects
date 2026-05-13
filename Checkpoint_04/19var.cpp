@@ -50,7 +50,7 @@ void updatePricesFromFile(Game* arr, int n, const char* filename) {
 void saveToBinary(Game* arr, int n, const char* filename) {
     ofstream out(filename, ios::binary | ios::out);
     if (out.is_open()) {
-        out.write((char*)arr, sizeof(Game) * n); // Записываем массив структур целиком [cite: 10]
+        out.write((char*)arr, sizeof(Game) * n); // Записываем массив структур целиком 
         out.close();
         cout << "Данные сохранены в бинарный файл." << endl;
     }
